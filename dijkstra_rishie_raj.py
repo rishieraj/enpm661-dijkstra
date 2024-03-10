@@ -1,15 +1,19 @@
+# GitHub Repository: https://github.com/rishieraj/enpm661-dijkstra.git
+
+# importing libraries and dependencies
 import numpy as np
 from queue import PriorityQueue
-import matplotlib.pyplot as plt
 import time
 import cv2
 
+# creating open and closed lists to manage the search
 open_list = PriorityQueue()
 close_list = set()
 
-# Define the Configuration Space
+# defining the Configuration Space
 def config_space():
 
+    # declaring Configuration Space as an array
     c_space = np.zeros((500, 1200))
 
     # Boundary + Clearance
@@ -39,6 +43,7 @@ def config_space():
             b3 = i - 356
             b4 = j
 
+            # initializing pixel values for clearances
             if (a1 > 0) and (a2 < 0) and (a3 < 0) and (a4 > 0):
                 c_space[j, i] = 1
 
@@ -56,6 +61,7 @@ def config_space():
             d3 = i - 350
             d4 = j
 
+            # initializing pixel values for obstacles
             if (c1 > 0) and (c2 < 0) and (c3 < 0) and (c4 > 0):
                 c_space[j, i] = 2
 
@@ -79,6 +85,7 @@ def config_space():
             g3 = i - 1106
             g4 = j - 119
 
+            # initializing pixel values for clearances
             if (e1 > 0) and (e2 < 0) and (e3 < 0) and (e4 > 0):
                 c_space[j, i] = 1
 
@@ -104,6 +111,7 @@ def config_space():
             j3 = i - 1100
             j4 = j - 124
 
+            # initializing pixel values for obstacles
             if (h1 > 0) and (h2 < 0) and (h3 < 0) and (h4 > 0):
                 c_space[j, i] = 2
 
@@ -130,22 +138,26 @@ def config_space():
             l5 = j - np.tan(np.radians(30)) * i + 281
             l6 = j + np.tan(np.radians(30)) * i - 469
 
+            # initializing pixel values for obstacles
             if (k1 > 0) and (k2 < 0) and (k3 < 0) and (k4 < 0) and (k5 > 0) and (k6 > 0):
                 c_space[j, i] = 2
 
+            # initializing pixel values for clearances
             if (l1 > 0) and (l2 < 0) and (l3 < 0) and (l4 < 0) and (l5 > 0) and (l6 > 0):
                 c_space[j, i] = 1
 
     return c_space      
 
-# Defining Actions    
+# defining Actions    
 def move_right(current_node, obs_space):
     x = current_node[3][0] + 1
     y = current_node[3][1]
 
+    # checking validity of action
     if (obs_space[y][x] == 1):
         return None
     
+    # updating C2C
     cost = current_node[0] + 1  
     new_node = [cost, current_node[1], current_node[2], (x, y)]
 
@@ -155,9 +167,11 @@ def move_left(current_node, obs_space):
     x = current_node[3][0] - 1
     y = current_node[3][1]
 
+    # checking validity of action
     if (obs_space[y][x] == 1):
         return None
     
+    # updating C2C
     cost = current_node[0] + 1  
     new_node = [cost, current_node[1], current_node[2], (x, y)]
 
@@ -167,9 +181,11 @@ def move_up(current_node, obs_space):
     x = current_node[3][0]
     y = current_node[3][1] + 1
 
+    # checking validity of action
     if (obs_space[y][x] == 1):
         return None
     
+    # updating C2C
     cost = current_node[0] + 1  
     new_node = [cost, current_node[1], current_node[2], (x, y)]
 
@@ -179,9 +195,11 @@ def move_down(current_node, obs_space):
     x = current_node[3][0]
     y = current_node[3][1] - 1
 
+    # checking validity of action
     if (obs_space[y][x] == 1):
         return None
     
+    # updating C2C
     cost = current_node[0] + 1  
     new_node = [cost, current_node[1], current_node[2], (x, y)]
 
@@ -191,9 +209,11 @@ def move_up_right(current_node, obs_space):
     x = current_node[3][0] + 1
     y = current_node[3][1] + 1
 
+    # checking validity of action
     if (obs_space[y][x] == 1):
         return None
     
+    # updating C2C
     cost = current_node[0] + 1.4  
     new_node = [cost, current_node[1], current_node[2], (x, y)]
 
@@ -203,9 +223,11 @@ def move_up_left(current_node, obs_space):
     x = current_node[3][0] - 1
     y = current_node[3][1] + 1
 
+    # checking validity of action
     if (obs_space[y][x] == 1):
         return None
     
+    # updating C2C
     cost = current_node[0] + 1.4  
     new_node = [cost, current_node[1], current_node[2], (x, y)]
 
@@ -215,9 +237,11 @@ def move_down_right(current_node, obs_space):
     x = current_node[3][0] + 1
     y = current_node[3][1] - 1
 
+    # checking validity of action
     if (obs_space[y][x] == 1):
         return None
     
+    # updating C2C
     cost = current_node[0] + 1.4  
     new_node = [cost, current_node[1], current_node[2], (x, y)]
 
@@ -227,18 +251,21 @@ def move_down_left(current_node, obs_space):
     x = current_node[3][0] - 1
     y = current_node[3][1] - 1
 
+    # checking validity of action
     if (obs_space[y][x] == 1):
         return None
     
+    # updating C2C
     cost = current_node[0] + 1.4  
     new_node = [cost, current_node[1], current_node[2], (x, y)]
 
     return new_node
 
 def dijkstra(start, goal, obs_space):
-    # (cost_to_come, node_index, parent_index, (x cordinate, y cordinate))
+    # structure of node: (cost_to_come, node_index, parent_index, (x cordinate, y cordinate))
     start_node = (0, 1, 0, start)
     open_list.put(start_node)
+    # creating a dict to track parent child relations for backtracking
     parent_map = {}
     parent_map[start] = None
 
@@ -254,11 +281,13 @@ def dijkstra(start, goal, obs_space):
 
         if current_node[3] == goal:
             print('Goal Reached!')
+            # calling backtracking function after goal node is reached
             path = back_tracking(parent_map, start, goal)
             return path, parent_map
         
         next_nodes = []
 
+        # performing action sets
         action_node1 = move_up(current_node, obs_space)
         if action_node1 != None:
             next_nodes.append(action_node1)
@@ -310,6 +339,7 @@ def dijkstra(start, goal, obs_space):
                             open_list.put(tuple(next_node))
                             node_number += 1
 
+# performing backtracking based on parent map
 def back_tracking(parent_map, start, goal):
     path = []
     current_node = goal
@@ -322,6 +352,7 @@ def back_tracking(parent_map, start, goal):
     path.reverse()
     return path
 
+# function for asking for user input of start and goal nodes
 def user_input(obs_space):
     while True:
         user_input_start = input("Enter the coordinates of the  start node as (X, Y): ")
@@ -351,18 +382,23 @@ def user_input(obs_space):
 
 if __name__ == '__main__':
 	
+    # creating configuration space
     obs_space = config_space()
+    # taking input for start and goal
     start_point, goal_point = user_input(obs_space)
-
+    # creating opencv video writing objects
     fourcc = cv2.VideoWriter_fourcc(*'mp4v')
     out = cv2.VideoWriter('dijkstra_rishie_raj.mp4', fourcc, 200.0, (1200, 500))
 
+    # timer object to measure computation time
     timer_start = time.time()
 
+    # implementing dijkstra
     optimal_path, visit_map = dijkstra(start_point, goal_point, obs_space)
 
     clearance = 5
 
+    # creating visualization canvas using opencv
     canvas = np.ones((500, 1200, 3), dtype=np.uint8) * 255
 
     cv2.line(canvas, pt1=(0, 500 - 0), pt2=(1200, 500 - 0), color=(0, 0, 0), thickness=1)
@@ -401,17 +437,19 @@ if __name__ == '__main__':
     c_time = timer_stop - timer_start
     print("Total Runtime: ", c_time)
 
-    # Create a window
+    # creating a visualization window
     cv2.namedWindow('Optimal Path Animation', cv2.WINDOW_NORMAL)
     cv2.resizeWindow('Optimal Path Animation', 1200, 500)
 
     count = 0
 
+    # displaying node exploration
     for key in visit_map.keys():
         adjusted_point = (key[0], 500 - key[1])
 
         cv2.circle(canvas, adjusted_point, 1, (0, 255, 0), -1)
 
+        # skipping frames for faster visualization
         if count % 100 == 0:
             cv2.imshow('Optimal Path Animation', canvas)
             cv2.waitKey(int(0.001 * 1000))
@@ -419,24 +457,19 @@ if __name__ == '__main__':
         
         count += 1
 
+    # displaying optimal path
     for point in optimal_path:
         adjusted_point = (point[0], 500 - point[1])
-        # Draw each point on the canvas
+
         cv2.circle(canvas, adjusted_point, 1, (0, 0, 255), -1)
         
-        # Display the canvas
         cv2.imshow('Optimal Path Animation', canvas)
         cv2.waitKey(int(0.001 * 1000))
         out.write(canvas)
 
-    # Keep the final image open until a key is pressed
+    # holding final frame till any key is pressed
     cv2.waitKey(0)
-    # Destroy the window after keypress
+    # releasing video write object
     out.release()
+    # destroying visualization window after keypress
     cv2.destroyAllWindows()
-
-    # plt.figure(figsize=(12, 5))
-    # plt.xlim(0, 1200)
-    # plt.ylim(500, 0)
-    # plt.imshow(cv2.cvtColor(canvas, cv2.COLOR_BGR2RGB))
-    # plt.show()
