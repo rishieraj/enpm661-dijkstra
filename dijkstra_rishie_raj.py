@@ -150,8 +150,8 @@ def config_space():
 
 # defining Actions    
 def move_right(current_node, obs_space):
-    x = current_node[3][0] + 1
-    y = current_node[3][1]
+    x = current_node[1][0] + 1
+    y = current_node[1][1]
 
     # checking validity of action
     if (obs_space[y][x] == 1):
@@ -159,13 +159,13 @@ def move_right(current_node, obs_space):
     
     # updating C2C
     cost = current_node[0] + 1  
-    new_node = [cost, current_node[1], current_node[2], (x, y)]
+    new_node = [cost, (x, y)]
 
     return new_node
 
 def move_left(current_node, obs_space):
-    x = current_node[3][0] - 1
-    y = current_node[3][1]
+    x = current_node[1][0] - 1
+    y = current_node[1][1]
 
     # checking validity of action
     if (obs_space[y][x] == 1):
@@ -173,13 +173,13 @@ def move_left(current_node, obs_space):
     
     # updating C2C
     cost = current_node[0] + 1  
-    new_node = [cost, current_node[1], current_node[2], (x, y)]
+    new_node = [cost, (x, y)]
 
     return new_node
 
 def move_up(current_node, obs_space):
-    x = current_node[3][0]
-    y = current_node[3][1] + 1
+    x = current_node[1][0]
+    y = current_node[1][1] + 1
 
     # checking validity of action
     if (obs_space[y][x] == 1):
@@ -187,13 +187,13 @@ def move_up(current_node, obs_space):
     
     # updating C2C
     cost = current_node[0] + 1  
-    new_node = [cost, current_node[1], current_node[2], (x, y)]
+    new_node = [cost, (x, y)]
 
     return new_node
 
 def move_down(current_node, obs_space):
-    x = current_node[3][0]
-    y = current_node[3][1] - 1
+    x = current_node[1][0]
+    y = current_node[1][1] - 1
 
     # checking validity of action
     if (obs_space[y][x] == 1):
@@ -201,13 +201,13 @@ def move_down(current_node, obs_space):
     
     # updating C2C
     cost = current_node[0] + 1  
-    new_node = [cost, current_node[1], current_node[2], (x, y)]
+    new_node = [cost, (x, y)]
 
     return new_node
 
 def move_up_right(current_node, obs_space):
-    x = current_node[3][0] + 1
-    y = current_node[3][1] + 1
+    x = current_node[1][0] + 1
+    y = current_node[1][1] + 1
 
     # checking validity of action
     if (obs_space[y][x] == 1):
@@ -215,13 +215,13 @@ def move_up_right(current_node, obs_space):
     
     # updating C2C
     cost = current_node[0] + 1.4  
-    new_node = [cost, current_node[1], current_node[2], (x, y)]
+    new_node = [cost, (x, y)]
 
     return new_node
 
 def move_up_left(current_node, obs_space):
-    x = current_node[3][0] - 1
-    y = current_node[3][1] + 1
+    x = current_node[1][0] - 1
+    y = current_node[1][1] + 1
 
     # checking validity of action
     if (obs_space[y][x] == 1):
@@ -229,13 +229,13 @@ def move_up_left(current_node, obs_space):
     
     # updating C2C
     cost = current_node[0] + 1.4  
-    new_node = [cost, current_node[1], current_node[2], (x, y)]
+    new_node = [cost, (x, y)]
 
     return new_node
 
 def move_down_right(current_node, obs_space):
-    x = current_node[3][0] + 1
-    y = current_node[3][1] - 1
+    x = current_node[1][0] + 1
+    y = current_node[1][1] - 1
 
     # checking validity of action
     if (obs_space[y][x] == 1):
@@ -243,13 +243,13 @@ def move_down_right(current_node, obs_space):
     
     # updating C2C
     cost = current_node[0] + 1.4  
-    new_node = [cost, current_node[1], current_node[2], (x, y)]
+    new_node = [cost, (x, y)]
 
     return new_node
 
 def move_down_left(current_node, obs_space):
-    x = current_node[3][0] - 1
-    y = current_node[3][1] - 1
+    x = current_node[1][0] - 1
+    y = current_node[1][1] - 1
 
     # checking validity of action
     if (obs_space[y][x] == 1):
@@ -257,29 +257,27 @@ def move_down_left(current_node, obs_space):
     
     # updating C2C
     cost = current_node[0] + 1.4  
-    new_node = [cost, current_node[1], current_node[2], (x, y)]
+    new_node = [cost, (x, y)]
 
     return new_node
 
 def dijkstra(start, goal, obs_space):
     # structure of node: (cost_to_come, node_index, parent_index, (x cordinate, y cordinate))
-    start_node = (0, 1, 0, start)
+    start_node = (0, start)
     open_list.put(start_node)
     # creating a dict to track parent child relations for backtracking
     parent_map = {}
     parent_map[start] = None
 
-    node_number = 2
-
     while not open_list.empty():
         current_node = open_list.get()
 
-        if current_node[3] in close_list:
+        if current_node[1] in close_list:
             continue
         
-        close_list.add(current_node[3])
+        close_list.add(current_node[1])
 
-        if current_node[3] == goal:
+        if current_node[1] == goal:
             print('Goal Reached!')
             # calling backtracking function after goal node is reached
             path = back_tracking(parent_map, start, goal)
@@ -321,23 +319,17 @@ def dijkstra(start, goal, obs_space):
             next_nodes.append(action_node8)
 
         for next_node in next_nodes:
-            if next_node[3] not in close_list:
-                if next_node[3] not in [x[3] for x in open_list.queue]:
-                    next_node[2] = current_node[1]
-                    parent_map[next_node[3]] = current_node[3]
-                    next_node[1] = node_number
+            if next_node[1] not in close_list:
+                if next_node[1] not in [x[1] for x in open_list.queue]:
+                    parent_map[next_node[1]] = current_node[1]
                     open_list.put(tuple(next_node))
-                    node_number += 1
                 
                 else:
                     for node in open_list.queue:
-                        if node[3] == next_node[3] and node[0] > next_node[0]:
+                        if node[1] == next_node[1] and node[0] > next_node[0]:
                             open_list.queue.remove(node)
-                            next_node[2] = current_node[1]
-                            parent_map[next_node[3]] = current_node[3]
-                            next_node[1] = node_number
+                            parent_map[next_node[1]] = current_node[1]
                             open_list.put(tuple(next_node))
-                            node_number += 1
 
 # performing backtracking based on parent map
 def back_tracking(parent_map, start, goal):
