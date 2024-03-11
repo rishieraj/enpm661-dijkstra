@@ -262,7 +262,7 @@ def move_down_left(current_node, obs_space):
     return new_node
 
 def dijkstra(start, goal, obs_space):
-    # structure of node: (cost_to_come, node_index, parent_index, (x cordinate, y cordinate))
+    # structure of node: (cost_to_come, (x cordinate, y cordinate))
     start_node = (0, start)
     open_list.put(start_node)
     # creating a dict to track parent child relations for backtracking
