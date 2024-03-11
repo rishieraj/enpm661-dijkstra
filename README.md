@@ -8,7 +8,7 @@ The goal of the project is to implement Dijkstra Algorithm to find the shortest 
 
  - `dijkstra_rishie_raj.py` : python script containing the code for the project.
 
- - `dijkstra_rishie_raj.mp4` : video file containing the visualization.
+ - `dijkstra_rishie_raj.mp4` : video file containing the visualization. The visualization has been shown for start: (50, 400) & goal: (400, 100).
 
  - `README.md` : markdown file containing instructions and details.
 
